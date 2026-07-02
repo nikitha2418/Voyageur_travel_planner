@@ -1,0 +1,5 @@
+.venv
+__pycache__
+*.pyc
+.env
+_verify_api.py
