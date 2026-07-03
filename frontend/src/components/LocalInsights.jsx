@@ -2,7 +2,7 @@ import React from "react";
 
 // Renders the STEP-1 destination research (local insights) defensively —
 // the LLM schema is guided but we never assume a field exists.
-export default function LocalInsights({ research }) {
+export default function LocalInsights({ research, hideCustoms = false }) {
   if (!research) return null;
 
   const {
@@ -57,7 +57,7 @@ export default function LocalInsights({ research }) {
           </div>
         )}
 
-        {customs_tips.length > 0 && (
+        {!hideCustoms && customs_tips.length > 0 && (
           <div>
             <h4>Customs & tips</h4>
             <ul>

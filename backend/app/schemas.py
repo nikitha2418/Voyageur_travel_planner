@@ -3,6 +3,27 @@ from typing import Any, Optional
 from pydantic import BaseModel, Field
 
 
+# --- Auth ---
+class SignupRequest(BaseModel):
+    email: str = Field(..., min_length=3, max_length=255)
+    password: str = Field(..., min_length=6, max_length=128)
+
+
+class LoginRequest(BaseModel):
+    email: str = Field(..., min_length=3, max_length=255)
+    password: str = Field(..., min_length=1, max_length=128)
+
+
+class UserOut(BaseModel):
+    id: int
+    email: str
+
+
+class AuthResponse(BaseModel):
+    token: str
+    user: UserOut
+
+
 class TripCreate(BaseModel):
     destination: str = Field(..., min_length=2, max_length=200)
     budget: float = Field(..., gt=0)

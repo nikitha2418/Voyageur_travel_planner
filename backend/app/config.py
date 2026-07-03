@@ -17,6 +17,8 @@ class Settings(BaseSettings):
 
     # --- App ---
     cors_origins: str = "*"
+    # Secret for signing auth tokens. Override in production via AUTH_SECRET.
+    auth_secret: str = "dev-secret-change-me-in-production"
 
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 

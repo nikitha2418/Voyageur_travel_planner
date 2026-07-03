@@ -8,7 +8,7 @@ from sqlalchemy.exc import OperationalError
 
 from .config import settings
 from .database import Base, engine
-from .routers import trips
+from .routers import trips, auth
 
 app = FastAPI(
     title="Travel Itinerary Planner with Local Insights",
@@ -52,4 +52,5 @@ def health() -> dict:
     return {"status": "ok", "model": settings.groq_model}
 
 
+app.include_router(auth.router)
 app.include_router(trips.router)
