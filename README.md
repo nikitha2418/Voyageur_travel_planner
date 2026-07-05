@@ -8,7 +8,8 @@ destination research  →  itinerary generation  →  budget check
    (local insights)        (day-by-day plan)      (fits the budget?)
 ```
 
-Trips are stored in **MySQL**, and users can **open, edit, save, and delete** them.
+Users **sign up / log in** (accounts stored in **MySQL**), then generate trips that are
+saved to the database — where they can **open, edit, save, and delete** them.
 
 ---
 
@@ -19,7 +20,8 @@ Trips are stored in **MySQL**, and users can **open, edit, save, and delete** th
 | LLM API      | **Groq** (`llama-3.3-70b-versatile`) with JSON mode    |
 | Prompt Eng.  | Role prompts, strict JSON schemas, 3-step chaining     |
 | Backend      | **Python + FastAPI + SQLAlchemy**                      |
-| Database     | **MySQL 8**                                            |
+| Auth         | **Email/password** login (PBKDF2 hashing + signed token, stdlib) |
+| Database     | **MySQL 8** (users + trips)                            |
 | Frontend     | **React (Vite) + HTML/CSS/JS**                         |
 | Deployment   | **Docker + docker-compose** (MySQL + backend + nginx)  |
 
@@ -39,18 +41,24 @@ Trips are stored in **MySQL**, and users can **open, edit, save, and delete** th
 │       ├── main.py            # FastAPI app + startup/DB init
 │       ├── config.py          # env-based settings
 │       ├── database.py        # SQLAlchemy engine/session
-│       ├── models.py          # Trip ORM model
+│       ├── models.py          # User + Trip ORM models
 │       ├── schemas.py         # Pydantic request/response models
 │       ├── prompts.py         # prompt-engineering templates (3 steps)
 │       ├── llm.py             # Groq client + prompt chain
-│       └── routers/trips.py   # generate / list / get / edit / delete
+│       ├── auth.py            # password hashing + signed tokens (stdlib)
+│       └── routers/
+│           ├── auth.py        # signup / login / me
+│           └── trips.py       # generate / list / get / edit / delete
 └── frontend/
     ├── Dockerfile             # multi-stage: vite build -> nginx
     ├── nginx.conf             # serves SPA + proxies /api -> backend
     └── src/
-        ├── App.jsx
+        ├── App.jsx            # auth gate + view routing
         ├── api.js
-        └── components/        # TripForm, ItineraryView, LocalInsights, BudgetPanel, SavedTrips
+        ├── auth.js            # login/signup client + token storage
+        └── components/        # AuthPage, Nav, TripForm, ItineraryView,
+                               # LocalInsights, BudgetPanel, PackingTips,
+                               # SavedTrips, EmptyState
 ```
 
 ---
@@ -79,7 +87,13 @@ Trips are stored in **MySQL**, and users can **open, edit, save, and delete** th
    - Backend API docs: **http://localhost:8000/docs**
    - Health check: **http://localhost:8000/api/health**
 
-The backend waits for MySQL to become healthy, then auto-creates the `trips` table.
+5. You'll land on a **login page** — click **Create an account**, sign up with any
+   email + password, and you're in. Then plan a trip in the **AI Designer**.
+
+The backend waits for MySQL to become healthy, then auto-creates the `users` and
+`trips` tables.
+
+> **Note:** subsequent runs need only `docker compose up -d` (no `--build`).
 
 To stop: `docker compose down` (add `-v` to also wipe the database volume).
 
