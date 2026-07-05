@@ -54,3 +54,13 @@ def health() -> dict:
 
 app.include_router(auth.router)
 app.include_router(trips.router)
+
+# Serve the built React frontend if it was bundled into the image (single-service
+# deploys like Railway/Render). API routes above take precedence over this mount.
+# Skipped locally where the frontend is served by its own nginx container.
+import os
+from fastapi.staticfiles import StaticFiles
+
+_static_dir = os.path.join(os.path.dirname(__file__), "..", "static")
+if os.path.isdir(_static_dir):
+    app.mount("/", StaticFiles(directory=_static_dir, html=True), name="frontend")
